@@ -83,8 +83,8 @@ jobs:
             sudo ufw --force enable 
             cd /home/ubuntu
             sudo rm -rf memories-server
-            git clone https://github.com/Eunice2000/Devinis-shop.git
-            cd Devinis-shop
+            https://github.com/Eunice2000/Devinis-store.git
+            cd Devinis-store
             npm install
             cd backend
             sudo rm /etc/nginx/sites-available/default
@@ -135,8 +135,8 @@ jobs:
             sudo ufw --force enable 
             cd /home/ubuntu/
             sudo rm -rf Devinis || true
-            git clone https://github.com/Eunice2000/Devinis-shop.git
-            cd Devinis-shop/frontend
+            https://github.com/Eunice2000/Devinis-store.git
+            cd Devinis-store/frontend
             npm install
             rm -rf build
             npm run build
