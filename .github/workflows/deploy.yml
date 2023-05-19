@@ -95,53 +95,53 @@ jobs:
             sudo systemctl restart nginx
 
 
-  ddeploy-client:
-    runs-on: ubuntu-latest
-    needs: [deploy-infra, deploy-server]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set IP env variable
-        run:  |-
-          echo CLIENT_PUBLIC_IP=${{ needs.deploy-infra.outputs.CLIENT_PUBLIC_IP }} >> $GITHUB_ENV
-          echo SERVER_PUBLIC_IP=${{ needs.deploy-infra.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
-      - name: Deploy client to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ env.CLIENT_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ env.PRIVATE_SSH_KEY }}
-          envs: PRIVATE_SSH_KEY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
-          script: |-
-            sudo apt-get update
-            sudo apt-get install git -y
-            echo "--NODE & NPM--"
-            echo "--INSTALL NVM TO USE A SPECIFIC NODE VERSION--"
-            sudo apt-get install curl
-            sudo curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-            nvm install 18
-            sudo apt install npm -y
-            echo "-----PM2------"
-            sudo npm install -g pm2
-            sudo pm2 startup systemd
-            echo "-----NGINX------"
-            sudo apt-get install -y nginx
-            echo "---FIREWALL---"
-            sudo ufw allow OpenSSH
-            sudo ufw allow 'Nginx Full'
-            sudo ufw --force enable 
-            cd /home/ubuntu/
-            sudo rm -rf Devinis || true
-            git clone https://github.com/Eunice2000/Devinis-store.git
-            cd Devinis-store/frontend
-            npm install
-            rm -rf build
-            npm run build
-            sudo pm2 delete react-build || true
-            pm2 serve build/ 3000 -f --name "react-build" --spa
-            sudo rm -rf /etc/nginx/sites-available/default
-            sudo cp default /etc/nginx/sites-available/ -r
-            sudo systemctl restart nginx
+  # ddeploy-client:
+  #   runs-on: ubuntu-latest
+  #   needs: [deploy-infra, deploy-server]
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+  #     - name: Set IP env variable
+  #       run:  |-
+  #         echo CLIENT_PUBLIC_IP=${{ needs.deploy-infra.outputs.CLIENT_PUBLIC_IP }} >> $GITHUB_ENV
+  #         echo SERVER_PUBLIC_IP=${{ needs.deploy-infra.outputs.SERVER_PUBLIC_IP }} >> $GITHUB_ENV
+  #     - name: Deploy client to EC2
+  #       uses: appleboy/ssh-action@master
+  #       with:
+  #         host: ${{ env.CLIENT_PUBLIC_IP }}
+  #         username: ubuntu
+  #         key: ${{ env.PRIVATE_SSH_KEY }}
+  #         envs: PRIVATE_SSH_KEY,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY
+  #         script: |-
+  #           sudo apt-get update
+  #           sudo apt-get install git -y
+  #           echo "--NODE & NPM--"
+  #           echo "--INSTALL NVM TO USE A SPECIFIC NODE VERSION--"
+  #           sudo apt-get install curl
+  #           sudo curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+  #           export NVM_DIR="$HOME/.nvm"
+  #           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" 
+  #           [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  #           nvm install 18
+  #           sudo apt install npm -y
+  #           echo "-----PM2------"
+  #           sudo npm install -g pm2
+  #           sudo pm2 startup systemd
+  #           echo "-----NGINX------"
+  #           sudo apt-get install -y nginx
+  #           echo "---FIREWALL---"
+  #           sudo ufw allow OpenSSH
+  #           sudo ufw allow 'Nginx Full'
+  #           sudo ufw --force enable 
+  #           cd /home/ubuntu/
+  #           sudo rm -rf Devinis || true
+  #           git clone https://github.com/Eunice2000/Devinis-store.git
+  #           cd Devinis-store/frontend
+  #           npm install
+  #           rm -rf build
+  #           npm run build
+  #           sudo pm2 delete react-build || true
+  #           pm2 serve build/ 3000 -f --name "react-build" --spa
+  #           sudo rm -rf /etc/nginx/sites-available/default
+  #           sudo cp default /etc/nginx/sites-available/ -r
+  #           sudo systemctl restart nginx
